@@ -71,7 +71,7 @@ void countSort(int *arr[], int n, int exp)
 
     // copy from output to arr
     for(i = 0; i < n; i++)
-        *arr[i] = output[i]
+        *arr[i] = output[i];
 }
 
 void *merger(int arr1[], int arr2[])
