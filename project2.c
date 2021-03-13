@@ -24,7 +24,11 @@ int main(int argc, const char* argv[])
  */
 void *sorter(int *arr[], int n)
 {
+    //TODO implement pthreads
     int m = getMax(arr, n);  // find greatest value in array
+
+    for(int exp = 1; m / exp > 0; exp *= 10)
+        countSort(arr, n, exp);
 }
 
 /**
@@ -48,9 +52,26 @@ int getMax(int arr[], int n)
  * @param n size of array
  * @param exp digit required for CountSort
  */
-void countSort(int arr[], int n, int exp)
+void countSort(int *arr[], int n, int exp)
 {
-    
+    int output[n];  // output array
+    int i, count[10] = {0};
+
+    for(i = 0; i < n; i++)
+        count[(*arr[i] / exp) % 10]++;
+
+    for(i = 1; i < 10; i++)
+        count[i] += count[i-1];
+
+    for(i = n - 1; i >= 0; i--)
+    {
+        output[count[(*arr[i] / exp) % 10] - 1] = arr[i];
+        count[(*arr[i] / exp) % 10]--;
+    }
+
+    // copy from output to arr
+    for(i = 0; i < n; i++)
+        *arr[i] = output[i]
 }
 
 void *merger(int arr1[], int arr2[])
