@@ -32,12 +32,13 @@ int main(int argc, const char* argv[])
     //check if the array size is even.
     //if not then add 1 more to the first array.
     if(size%2 == 0){
-   	 arrsize1=size/2;
-   	 arrsize2=size/2;
+   	    arrsize1=size/2;
+   	    arrsize2=size/2;
     }
-    else{
-   	 arrsize1=(size/2) +!;
-   	 arrsize2=size/2
+    else
+    {
+   	    arrsize1=(size/2) + 1;
+   	    arrsize2=size/2;
     }
     pthread_t thread[NUM_THREADS];
     pthread_attr_t attr;
