@@ -39,6 +39,11 @@ struct mergerParams
 
 int main(int argc, const char* argv[])
 {
+	
+	for(int i = 0; i < arrSize; i++)
+	{
+		printf("%d ", list[i]);
+	}
 	//time how long it takes.
 	clock_t t1, t2; // Time the both thread 1 and 2.
 	t1 = clock();
@@ -54,7 +59,7 @@ int main(int argc, const char* argv[])
 	pthread_t thread1[1];
 	pthread_t thread2[1];
 	pthread_t thread3[1];
-    
+
 
 	struct sorterParams args[2];
 	args[0].begin = 0;
@@ -79,6 +84,11 @@ int main(int argc, const char* argv[])
 	pthread_create(&thread3[1], &attr, merger, &margs);
 
 	pthread_join(thread3[1], NULL);
+
+	for(int i = 0; i < arrSize; i++)
+	{
+		printf("%d ", sorted[i]);
+	}
 
     pthread_exit(NULL);
 	return 0;
@@ -164,5 +174,13 @@ void merge(int begin, int middle, int end)
 	while(j < arrsize2)
 	{
     	list[k++] = right[j++];
+	}
+}
+
+void printArray(int arr[], int n)
+{
+	for(int i = 0; i < n; i++)
+	{
+		printf("%d ", arr[i]);
 	}
 }
