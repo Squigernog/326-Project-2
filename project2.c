@@ -18,7 +18,11 @@ int list[arrSize]={67,3,24,5,2,99,432,77,45,1};
 int sorted[arrSize];  // will hold sorted array
 
  //2 for the sorting, and 1 for merging.
- #define NUM_THREADS 3
+ #define NUM_THREADS	3
+ void *sorter(void *arg); //Declare sorter function
+ void *merger(void *arg); //Declare merger function
+ void MergeSort(int begin, int end);
+ void merge(int begin, int middle, int end);
 
 struct sorterParams
 {
@@ -35,13 +39,22 @@ struct mergerParams
 
 int main(int argc, const char* argv[])
 {
-    //time how long it takes.
-    clock_t t1, t2; // Time the both thread 1 and 2.
-    
+	//time how long it takes.
+	clock_t t1, t2; // Time the both thread 1 and 2.
 	t1 = clock();
-    pthread_t thread[NUM_THREADS];
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
+    
+	pthread_t thread[NUM_THREADS];
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+    
+	int *threads1=(int*)malloc(sizeof(int)*2);
+	int *threads2=(int*)malloc(sizeof(int)*2);
+	int *threads3=(int*)malloc(sizeof(int)*1);
+    
+	pthread_t thread1[1];
+	pthread_t thread2[1];
+	pthread_t thread3[1];
+    
 
 	struct sorterParams args[2];
 	args[0].begin = 0;
@@ -50,26 +63,28 @@ int main(int argc, const char* argv[])
 	args[1].begin = (arrSize / 2) + 1;
 	args[1].end = arrSize - 1;
 
-    //Create the threads for sorting.
-    pthread_create(&thread[0], &attr, sorter, &args[0]);
-    pthread_create(&thread[1], &attr, sorter, &args[1]);
+	//Create the threads for sorting.
+	pthread_create(&thread1[1], &attr, sorter, &args[0]);
+	pthread_create(&thread2[1], &attr, sorter, &args[1]);
 
-    //Wait for the threads to finish.
-    pthread_join(thread[0],NULL);
-    pthread_join(thread[1],NULL);
+	//Wait for the threads to finish.
+	pthread_join(thread1[1],NULL);
+	pthread_join(thread2[1],NULL);
 
+	//create the thread for merger.
 	struct mergerParams margs;
 	margs.begin = 0;
 	margs.middle = (arrSize / 2) + 1;
 	margs.end = arrSize - 1;
-	pthread_create(&thread[2], &attr, merger, &margs);
+	pthread_create(&thread3[1], &attr, merger, &margs);
 
-    pthread_join(thread[2], NULL);
+	pthread_join(thread3[1], NULL);
 
+    
 	return 0;
 }
 
-void* sorter(void* arg)
+void *sorter(void *arg)
 {
 	struct sorterParams *params = (struct sorterParams*) arg;
 	int begin = params->begin;
@@ -78,11 +93,11 @@ void* sorter(void* arg)
 	int middle = begin + (end - begin) / 2;
 	if (begin < end)
 	{
-		MergeSort(begin, middle);
-		MergeSort(middle + 1, end);
-		merge(begin, middle, end);
+    	MergeSort(begin, middle);
+    	MergeSort(middle + 1, end);
+    	merge(begin, middle, end);
 	}
-	
+    
 }
 
 void MergeSort(int begin, int end)
@@ -91,27 +106,28 @@ void MergeSort(int begin, int end)
 
 	if(begin < end)
 	{
-		MergeSort(begin, middle);
-		MergeSort(middle + 1, end);
+    	MergeSort(begin, middle);
+    	MergeSort(middle + 1, end);
 	}
 }
 /**
 * Merge Thread
 */
 
-void *merger(void* arg)
+void *merger(void *arg)
 {
 	struct mergerParams *params = (struct mergerParmas*) arg;
 	int begin = params->begin,
-		middle = params-> middle,
-		end = params-> end;
+    	middle = params-> middle,
+    	end = params-> end;
 
 	if(begin < end)
 	{
-		MergeSort(begin, middle);
-		MergeSort(middle + 1, end);
-		merge(begin, middle, end);
+    	MergeSort(begin, middle);
+    	MergeSort(middle + 1, end);
+    	merge(begin, middle, end);
 	}
+    
 }
 
 void merge(int begin, int middle, int end)
@@ -125,28 +141,28 @@ void merge(int begin, int middle, int end)
 	int i = 0, j = 0;
 
 	for(i = 0; i < arrsize1; i++)
-		left[i] = list[i + begin];
+    	left[i] = list[i + begin];
 
 	for(i = 0; i < arrsize2; i++)
-		right[i] = list[i + middle + 1];
+    	right[i] = list[i + middle + 1];
 
 	i = 0;
 	int k = begin;
 
 	while (i < arrsize1 && j < arrsize2)
 	{
-		if(left[i] <= right[j])
-			list[begin++] = left[i++];
-		else
-			list[k++] = right[j++];
+    	if(left[i] <= right[j])
+        	list[begin++] = left[i++];
+    	else
+        	list[k++] = right[j++];
 	}
 
 	while(i < arrsize1)
 	{
-		list[k++] = left[i++];
+    	list[k++] = left[i++];
 	}
 	while(j < arrsize2)
 	{
-		list[k++] = right[j++];
+    	list[k++] = right[j++];
 	}
 }
