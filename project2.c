@@ -45,8 +45,8 @@ int main(int argc, const char* argv[])
 		printf("%d ", list[i]);
 	}
 	//time how long it takes.
-	clock_t t1, t2; // Time the both thread 1 and 2.
-	t1 = clock();
+	// Time the both thread 1 and 2.
+	clock_t start = clock();
     
 	pthread_t thread[NUM_THREADS];
 	pthread_attr_t attr;
@@ -84,11 +84,15 @@ int main(int argc, const char* argv[])
 	pthread_create(&thread3[1], &attr, merger, &margs);
 
 	pthread_join(thread3[1], NULL);
+	
+	clock_t end = clock;
 
 	for(int i = 0; i < arrSize; i++)
 	{
 		printf("%d ", sorted[i]);
 	}
+
+	
 
     pthread_exit(NULL);
 	return 0;
