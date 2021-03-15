@@ -18,7 +18,6 @@ int list[arrSize]={67,3,24,5,2,99,432,77,45,1};
 int sorted[arrSize];  // will hold sorted array
 
  //2 for the sorting, and 1 for merging.
- #define NUM_THREADS	3
  void *sorter(void *arg); //Declare sorter function
  void *merger(void *arg); //Declare merger function
  void MergeSort(int begin, int end);
@@ -48,14 +47,16 @@ int main(int argc, const char* argv[])
 	// Time the both thread 1 and 2.
 	clock_t start = clock();
     
-	pthread_t thread[NUM_THREADS];
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
         
+	//created 3 threads.
 	pthread_t thread1[1];
 	pthread_t thread2[1];
 	pthread_t thread3[1];
-
+	
+	//allocating memory for the threads.
+	//sorting threads will hold 2 values, merging holds 1
 	int *threads1=(int*)malloc(sizeof(int)*2);
 	int *threads2=(int*)malloc(sizeof(int)*2);
 	int *threads3=(int*)malloc(sizeof(int)*1);
