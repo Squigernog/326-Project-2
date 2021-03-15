@@ -15,13 +15,14 @@
 #define arrSize 10
  //List for testing
 int list[arrSize]={67,3,24,5,2,99,432,77,45,1};
+int sorted[arrSize];  // will hold sorted array
 
  //2 for the sorting, and 1 for merging.
  #define NUM_THREADS 3
 
-struct sortParams
+struct sorterParams
 {
-	int start;
+	int begin;
 	int end;
 };
 
@@ -42,12 +43,12 @@ int main(int argc, const char* argv[])
     pthread_attr_t attr;
     pthread_attr_init(&attr);
 
-	struct sortParams args[2];
-	args[0].start = 0;
+	struct sorterParams args[2];
+	args[0].begin = 0;
 	args[0].end = arrSize / 2;
 
-	args[1].start = (arrSize / 2) + 1;
-	args[1].end = arrSize;
+	args[1].begin = (arrSize / 2) + 1;
+	args[1].end = arrSize - 1;
 
     //Create the threads for sorting.
     pthread_create(&thread[0], &attr, sorter, &args[0]);
@@ -56,40 +57,96 @@ int main(int argc, const char* argv[])
     //Wait for the threads to finish.
     pthread_join(thread[0],NULL);
     pthread_join(thread[1],NULL);
-    
+
+	struct mergerParams margs;
+	margs.begin = 0;
+	margs.middle = (arrSize / 2) + 1;
+	margs.end = arrSize - 1;
+	pthread_create(&thread[2], &attr, merger, &margs);
+
+    pthread_join(thread[2], NULL);
+
+	return 0;
 }
 
 void* sorter(void* arg)
 {
+	struct sorterParams *params = (struct sorterParams*) arg;
+	int begin = params->begin;
+	int end = params-> end;
+
+	int middle = begin + (end - begin) / 2;
+	if (begin < end)
+	{
+		MergeSort(begin, middle);
+		MergeSort(middle + 1, end);
+		merge(begin, middle, end);
+	}
 	
 }
 
-/**
- * Merge Sort algorithm
- * @param begin Starting index
- * @param end last index
- */
 void MergeSort(int begin, int end)
 {
-	int middle = end / 2;  // middle point of array
+	int middle = begin + (end - begin) / 2;
 
-	MergeSort(begin, middle);  // sort left half
-	MergeSort(middle + 1, end);  // sort right half
+	if(begin < end)
+	{
+		MergeSort(begin, middle);
+		MergeSort(middle + 1, end);
+	}
 }
-
 /**
 * Merge Thread
 */
 
-void *merger(void* args)
+void *merger(void* arg)
 {
-	struct mergerParams *params = (struct mergerParmas*) args;
+	struct mergerParams *params = (struct mergerParmas*) arg;
 	int begin = params->begin,
 		middle = params-> middle,
 		end = params-> end;
 
-	for(int i = 0; i < middle; i++)
+	if(begin < end)
 	{
-		
+		MergeSort(begin, middle);
+		MergeSort(middle + 1, end);
+		merge(begin, middle, end);
+	}
+}
+
+void merge(int begin, int middle, int end)
+{
+	int *left = (int*)malloc(sizeof(int)*(middle - begin + 1));
+	int *right = (int*)malloc(sizeof(int)*(end - middle));
+
+	int arrsize1 = middle - begin - 1;
+	int arrsize2 = end - middle;
+
+	int i = 0, j = 0;
+
+	for(i = 0; i < arrsize1; i++)
+		left[i] = list[i + begin];
+
+	for(i = 0; i < arrsize2; i++)
+		right[i] = list[i + middle + 1];
+
+	i = 0;
+	int k = begin;
+
+	while (i < arrsize1 && j < arrsize2)
+	{
+		if(left[i] <= right[j])
+			list[begin++] = left[i++];
+		else
+			list[k++] = right[j++];
+	}
+
+	while(i < arrsize1)
+	{
+		list[k++] = left[i++];
+	}
+	while(j < arrsize2)
+	{
+		list[k++] = right[j++];
 	}
 }
