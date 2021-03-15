@@ -80,7 +80,7 @@ int main(int argc, const char* argv[])
 
 	pthread_join(thread3[1], NULL);
 
-    
+    pthread_exit(NULL);
 	return 0;
 }
 
@@ -116,7 +116,7 @@ void MergeSort(int begin, int end)
 
 void *merger(void *arg)
 {
-	struct mergerParams *params = (struct mergerParmas*) arg;
+	struct mergerParams *params = (struct mergerParams*) arg;
 	int begin = params->begin,
     	middle = params-> middle,
     	end = params-> end;
