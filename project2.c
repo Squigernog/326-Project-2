@@ -21,7 +21,7 @@ int sorted[arrSize];  // will hold sorted array
  #define NUM_THREADS	3
  void *sorter(void *arg); //Declare sorter function
  void *merger(void *arg); //Declare merger function
- void MergeSort(int begin, int end);
+ void MergeSort(int list[], int begin, int end);
  void merge(int begin, int middle, int end);
 
 struct sorterParams
@@ -44,6 +44,7 @@ int main(int argc, const char* argv[])
 	{
 		printf("%d ", list[i]);
 	}
+	printf("\n");
 	//time how long it takes.
 	clock_t t1, t2; // Time the both thread 1 and 2.
 	t1 = clock();
@@ -87,9 +88,9 @@ int main(int argc, const char* argv[])
 
 	for(int i = 0; i < arrSize; i++)
 	{
-		printf("%d ", sorted[i]);
+		printf("%d ", list[i]);
 	}
-
+	printf("\n");
     pthread_exit(NULL);
 	return 0;
 }
@@ -100,30 +101,28 @@ void *sorter(void *arg)
 	int begin = params->begin;
 	int end = params-> end;
 
-	int middle = begin + (end - begin) / 2;
-	if (begin < end)
+	int i = begin, j, num;
+
+	while(i <= end)
 	{
-    	MergeSort(begin, middle);
-    	MergeSort(middle + 1, end);
-    	merge(begin, middle, end);
+		num = list[i];
+		j = i - 1;
+		while(j >= begin && num < list[j])
+			list[j+1] = list[j--];
+		
+		list[j+1] = num;
+		i++;
 	}
-    
+    for(int i = 0; i < arrSize; i++)
+	{
+		printf("%d ", list[i]);
+	}
+	printf("\n");
 }
 
-void MergeSort(int begin, int end)
-{
-	int middle = begin + (end - begin) / 2;
-
-	if(begin < end)
-	{
-    	MergeSort(begin, middle);
-    	MergeSort(middle + 1, end);
-	}
-}
 /**
 * Merge Thread
 */
-
 void *merger(void *arg)
 {
 	struct mergerParams *params = (struct mergerParams*) arg;
@@ -131,32 +130,41 @@ void *merger(void *arg)
     	middle = params-> middle,
     	end = params-> end;
 
-	if(begin < end)
+	int i = begin, j = middle, k = begin;
+
+	while (i < middle && j <= end)
 	{
-    	MergeSort(begin, middle);
-    	MergeSort(middle + 1, end);
-    	merge(begin, middle, end);
+		if(list[i] < list[j])
+			sorted[k++] = list[i++];
+		else
+			sorted[k++] = list[j++];
 	}
+
+	while(i < middle)
+		sorted[k++] = list[i++];
+
+	while(j <= end)
+		sorted[k++] = list[j++];
     
 }
 
 void merge(int begin, int middle, int end)
 {
-	int *left = (int*)malloc(sizeof(int)*(middle - begin + 1));
-	int *right = (int*)malloc(sizeof(int)*(end - middle));
+	
 
 	int arrsize1 = middle - begin - 1;
 	int arrsize2 = end - middle;
-
+	int left[arrsize1];
+	int right[arrsize2];
 	int i = 0, j = 0;
 
 	for(i = 0; i < arrsize1; i++)
-    	left[i] = list[i + begin];
+    	left[i] = list[begin + i];
 
-	for(i = 0; i < arrsize2; i++)
-    	right[i] = list[i + middle + 1];
+	for(i = 0; j < arrsize2; j++)
+    	right[j] = list[middle + 1 + j];
 
-	i = 0;
+	i = 0, j = 0;
 	int k = begin;
 
 	while (i < arrsize1 && j < arrsize2)
@@ -174,13 +182,5 @@ void merge(int begin, int middle, int end)
 	while(j < arrsize2)
 	{
     	list[k++] = right[j++];
-	}
-}
-
-void printArray(int arr[], int n)
-{
-	for(int i = 0; i < n; i++)
-	{
-		printf("%d ", arr[i]);
 	}
 }
