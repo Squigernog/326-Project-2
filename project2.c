@@ -51,14 +51,14 @@ int main(int argc, const char* argv[])
 	pthread_t thread[NUM_THREADS];
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
-    
-	int *threads1=(int*)malloc(sizeof(int)*2);
-	int *threads2=(int*)malloc(sizeof(int)*2);
-	int *threads3=(int*)malloc(sizeof(int)*1);
-    
+        
 	pthread_t thread1[1];
 	pthread_t thread2[1];
 	pthread_t thread3[1];
+
+	int *threads1=(int*)malloc(sizeof(int)*2);
+	int *threads2=(int*)malloc(sizeof(int)*2);
+	int *threads3=(int*)malloc(sizeof(int)*1);
 
 
 	struct sorterParams args[2];
