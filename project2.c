@@ -11,113 +11,85 @@
  * @version 0.1
  * @date 3/14/2021
  */
- 
+
+#define arrSize 10
  //List for testing
-int list[10]={67,3,24,5,2,99,432,77,45,1};
+int list[arrSize]={67,3,24,5,2,99,432,77,45,1};
 
  //2 for the sorting, and 1 for merging.
  #define NUM_THREADS 3
 
- 
+struct sortParams
+{
+	int start;
+	int end;
+};
+
+struct mergerParams
+{
+	int begin;
+	int middle;
+	int end;
+};
+
 int main(int argc, const char* argv[])
 {
     //time how long it takes.
     clock_t t1, t2; // Time the both thread 1 and 2.
-    //determine the size of the list.
-    int size = sizeof(list)/sizeof(int);
-    int arrsize1;
-    int arrsize2;
     
-    
-    //check if the array size is even.
-    //if not then add 1 more to the first array.
-    if(size%2 == 0){
-   	    arrsize1=size/2;
-   	    arrsize2=size/2;
-    }
-    else
-    {
-   	    arrsize1=(size/2) + 1;
-   	    arrsize2=size/2;
-    }
+	t1 = clock();
     pthread_t thread[NUM_THREADS];
     pthread_attr_t attr;
     pthread_attr_init(&attr);
-    
+
+	struct sortParams args[2];
+	args[0].start = 0;
+	args[0].end = arrSize / 2;
+
+	args[1].start = (arrSize / 2) + 1;
+	args[1].end = arrSize;
+
     //Create the threads for sorting.
-    pthread_create(&thread[0], &attr, countSort,(void*)NULL);
-    pthread_create(&thread[1], &attr, countSort,(void*)NULL);
-    
+    pthread_create(&thread[0], &attr, sorter, &args[0]);
+    pthread_create(&thread[1], &attr, sorter, &args[1]);
+
     //Wait for the threads to finish.
     pthread_join(thread[0],NULL);
     pthread_join(thread[1],NULL);
     
-    
+}
+
+void* sorter(void* arg)
+{
+	
 }
 
 /**
- * A sorter that implements the use of radix sort
- * @param arr An array of integers
- * @param n Size of the array
+ * Merge Sort algorithm
+ * @param begin Starting index
+ * @param end last index
  */
-void *sorter(int *arr[], int n)
+void MergeSort(int begin, int end)
 {
+	int middle = end / 2;  // middle point of array
 
-	//TODO implement pthreads
-	int m = getMax(arr, n);  // find greatest value in array
-
-	for(int exp = 1; m / exp > 0; exp *= 10)
-    	countSort(arr, n, exp);
-}
-
-/**
- * return max integer value in an array
- * @param arr Array to be analyzed for max int value
- * @param n size of array
- * @return max int value in array
- */
-int getMax(int arr[], int n)
-{
-	int max = arr[0];
-	for(int i = 1; i < n; i++)
-    	if(arr[i] > max)
-        	max = arr[i];
-	return max;
-}
-
-/**
- * CountSort algorithm for an integer array
- * @param arr array to be sorted
- * @param n size of array
- * @param exp digit required for CountSort
- */
-void countSort(int *arr[], int n, int exp)
-{
-	int output[n];  // output array
-	int i, count[10] = {0};
-
-	for(i = 0; i < n; i++)
-   	 count[(*arr[i] / exp) % 10]++;
-
-   	 for(i = 1; i < 10; i++)
-   		 count[i] += count[i-1];
-
-   	 for(i = n - 1; i >= 0; i--)
-    {
-    	output[count[(*arr[i] / exp) % 10] - 1] = arr[i];
-    count[(*arr[i] / exp) % 10]--;
-   	 }
-
-   	 // copy from output to arr
-  	 for(i = 0; i < n; i++)
-  	  	*arr[i] = output[i];
+	MergeSort(begin, middle);  // sort left half
+	MergeSort(middle + 1, end);  // sort right half
 }
 
 /**
 * Merge Thread
 */
 
-void *merger(int arr1[], int arr2[])
+void *merger(void* args)
 {
+	struct mergerParams *params = (struct mergerParmas*) args;
+	int begin = params->begin,
+		middle = params-> middle,
+		end = params-> end;
 
+	for(int i = 0; i < middle; i++)
+	{
+		
+	}
 }
