@@ -50,41 +50,31 @@ int main(int argc, const char* argv[])
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
         
-	//created 3 threads.
-	pthread_t thread1[1];
-	pthread_t thread2[1];
-	pthread_t thread3[1];
-	
-	//allocating memory for the threads.
-	//sorting threads will hold 2 values, merging holds 1
-	int *threads1=(int*)malloc(sizeof(int)*2);
-	int *threads2=(int*)malloc(sizeof(int)*2);
-	int *threads3=(int*)malloc(sizeof(int)*1);
-
+	pthread_t thread[NUM_THREADS];
 
 	struct sorterParams args[2];
-	args[0].begin = 0;
+	[0].begin = 0;
 	args[0].end = arrSize / 2;
 
 	args[1].begin = (arrSize / 2) + 1;
 	args[1].end = arrSize - 1;
 
 	//Create the threads for sorting.
-	pthread_create(&thread1[1], &attr, sorter, &args[0]);
-	pthread_create(&thread2[1], &attr, sorter, &args[1]);
+	pthread_create(&thread[1], &attr, sorter, &args[0]);
+	pthread_create(&thread[2], &attr, sorter, &args[1]);
 
 	//Wait for the threads to finish.
-	pthread_join(thread1[1],NULL);
-	pthread_join(thread2[1],NULL);
+	pthread_join(thread[1],NULL);
+	pthread_join(thread[2],NULL);
 
 	//create the thread for merger.
 	struct mergerParams margs;
 	margs.begin = 0;
 	margs.middle = (arrSize / 2) + 1;
 	margs.end = arrSize - 1;
-	pthread_create(&thread3[1], &attr, merger, &margs);
+	pthread_create(&thread[3], &attr, merger, &margs);
 
-	pthread_join(thread3[1], NULL);
+	pthread_join(thread[3], NULL);
 	
 	clock_t end = clock;
 
