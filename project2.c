@@ -13,17 +13,18 @@
  */
 
 #define arrSize 10
- //List for testing
+//List for testing
 int list[arrSize]={67,3,24,5,2,99,432,77,45,1};
 
- //2 for the sorting, and 1 for merging.
- #define NUM_THREADS	3
- void *sorter(void *arg); //Declare sorter function
- void *merger(void *arg); //Declare merger function
- void MergeSort(int list[], int begin, int end);
- void merge(int begin, int middle, int end);
+//2 for the sorting, and 1 for merging.
+void *sorter(void *arg); //Declare sorter function
+void *merger(void *arg); //Declare merger function
+void MergeSort(int list[], int begin, int end);
+void merge(int begin, int middle, int end);
 
- int thread = 0;  // what thread number is active
+int thread = 0;  // what thread number is active
+
+#define NUM_THREADS 3
 
 struct mergerParams
 {
@@ -59,17 +60,25 @@ int main(int argc, const char* argv[])
 	margs.begin = 0;
 	margs.middle = (arrSize / 2) + 1;
 	margs.end = arrSize - 1;
+
 	printf("Merging thread...\n");
 	printf("\n");
 	pthread_create(&thread[2], NULL, merger, &margs);
 
 	pthread_join(thread[2], NULL);
 
+
+
 	for(int i = 0; i < arrSize; i++)
 	{
 		printf("%d ", list[i]);
 	}
+
 	printf("\n");
+
+
+	
+
     pthread_exit(NULL);
 	return 0;
 }
