@@ -8,8 +8,8 @@
  * The purpose of this program is to use 2 pthreads to sort one array in two parts and merge those two arrays into one sorted array.
  * @author Luke Olsen
  * @author Nicholas Wong
- * @version 0.1
- * @date 3/14/2021
+ * @version 1.0
+ * @date 3/16/2021
  */
 
 //Max arraysize
@@ -24,13 +24,16 @@ void *merger(void *arg); //Declare merger function
 
 int thread = 0;  // what thread number is active
 
-//Struct for the parameters
+//Struct for the parameters needed for merge thread
 struct Params
 {
     int begin;
     int end;
 };
 
+/**
+ * Main driver of program.
+ */
 int main(int argc, const char* argv[])
 {
 	printf("Current Array list: ");
@@ -83,6 +86,10 @@ int main(int argc, const char* argv[])
 	pthread_exit(NULL);
 	return 0;
 }
+
+/**
+ * Method made for assigning a thread to sorting arrays
+ */
 void *sorter(void *arg)
 {   
 	//To show what thread we are in.
@@ -116,6 +123,8 @@ void *sorter(void *arg)
 
 /**
 * Merge Thread
+* @param begin beginning of array
+* @param end end of array
 */
 void *merger(void *arg)
 {
