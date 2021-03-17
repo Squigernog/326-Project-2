@@ -17,7 +17,7 @@
 //Max number of threads
 #define NUM_THREADS 3
 //List for testing
-int list[arrSize]={67,3,24,5,2,99,432,77,45,1};
+int list[arrSize]={67,3,24,5,42,99,432,77,45,1};
 //2 for the sorting, and 1 for merging.
 void *sorter(void *arg); //Declare sorter function
 void *merger(void *arg); //Declare merger function
@@ -36,7 +36,7 @@ int main(int argc, const char* argv[])
 	printf("Current Array list: ");
 	for(int i = 0; i < arrSize; i++)
 	{
-    	     printf("%d ", list[i]);
+    	printf("%d ", list[i]);
 	}
 	printf("\n");
 
@@ -57,8 +57,6 @@ int main(int argc, const char* argv[])
 	pthread_create(&thread[1], NULL, sorter, &sargs2);
 
 	//Wait for the threads to finish.
-	printf("Joining thread 0...\n");
-	printf("\n");
 	pthread_join(thread[0],NULL);
 	pthread_join(thread[1],NULL);
 
@@ -77,7 +75,7 @@ int main(int argc, const char* argv[])
 	printf("Sorted List:");
 	for(int i = 0; i < arrSize; i++)
 	{
-    	     printf("%d ", list[i]);
+    	printf("%d ", list[i]);
 	}
 
 	printf("\n");
@@ -94,22 +92,27 @@ void *sorter(void *arg)
 	//Create the variables using struct.
 	struct Params *p = (struct Params *) arg;
 	int begin = p->begin;
-	int end = p->end+1;
-    
+	int end = p->end;
 	//Bubble Sort
 	int a,b,temp;
 	for(a=begin; a<end; a++)
 	{
-    	     for(b=begin; b<end; b++)
-    	     {
-         	 if(list[b]>list[b+1])
-         	 {
+    	for(b=begin; b<end; b++)
+    	{
+         	if(list[b]>list[b+1])
+         	{
    			temp=list[b];
    			list[b]=list[b+1];
    			list[b+1]=temp;
-         	 }
-    	     }
+         	}
+    	}
 	}
+	printf("What the list looks like:");
+	for(int i = 0; i < arrSize; i++)
+	{
+    	printf("%d ", list[i]);
+	}
+	printf("\n");
 }
 
 /**
@@ -126,17 +129,18 @@ void *merger(void *arg)
 	int a,b,temp;
 	for(a=begin; a<end; a++)
 	{
-    	     for(b=begin; b<end; b++)
-    	     {
-         	 if(list[b]>list[b+1])
-         	 {
+    	for(b=begin; b<end; b++)
+    	{
+         	if(list[b]>list[b+1])
+         	{
    			temp=list[b];
    			list[b]=list[b+1];
    			list[b+1]=temp;
-         	 }
-    	     }
+         	}
+    	}
 	}
 }
+
 
 
 
