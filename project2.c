@@ -12,42 +12,49 @@
  * @date 3/14/2021
  */
 
+//Max arraysize
 #define arrSize 10
+//Max number of threads
+#define NUM_THREADS 3
 //List for testing
 int list[arrSize]={67,3,24,5,2,99,432,77,45,1};
-
 //2 for the sorting, and 1 for merging.
 void *sorter(void *arg); //Declare sorter function
 void *merger(void *arg); //Declare merger function
-void MergeSort(int list[], int begin, int end);
-void merge(int begin, int middle, int end);
 
 int thread = 0;  // what thread number is active
 
-#define NUM_THREADS 3
-
-struct mergerParams
+//Struct for the parameters
+struct Params
 {
-	int begin;
-	int middle;
-	int end;
+    int begin;
+    int end;
 };
 
 int main(int argc, const char* argv[])
 {
-	
+	printf("Current Array list: ");
 	for(int i = 0; i < arrSize; i++)
 	{
-		printf("%d ", list[i]);
+    	     printf("%d ", list[i]);
 	}
-    printf("\n");
+	printf("\n");
 
 	pthread_t thread[NUM_THREADS];
     
+    
 	// Create sorting threads
 	printf("Creating sorting threads...\n");
-	pthread_create(&thread[0], NULL, sorter, NULL);
-	pthread_create(&thread[1], NULL, sorter, NULL);
+	//First thread for first half of list.
+	struct Params sargs1;
+	sargs1.begin=0;
+	sargs1.end=(arrSize/2)-1;
+	pthread_create(&thread[0], NULL, sorter, &sargs1);
+	//Second thread for second half of list.
+	struct Params sargs2;
+	sargs2.begin=arrSize/2;
+	sargs2.end=arrSize-1;
+	pthread_create(&thread[1], NULL, sorter, &sargs2);
 
 	//Wait for the threads to finish.
 	printf("Joining thread 0...\n");
@@ -56,77 +63,53 @@ int main(int argc, const char* argv[])
 	pthread_join(thread[1],NULL);
 
 	//create the thread for merger.
-	struct mergerParams margs;
+	struct Params margs;
 	margs.begin = 0;
-	margs.middle = (arrSize / 2) + 1;
-	margs.end = arrSize - 1;
+	margs.end = arrSize / 2;
 
 	printf("Merging thread...\n");
 	printf("\n");
 	pthread_create(&thread[2], NULL, merger, &margs);
-
+	//Waits for the merging thread to finish
 	pthread_join(thread[2], NULL);
-
-
-
+    
+	//Display the sorted list
+	printf("Sorted List:");
 	for(int i = 0; i < arrSize; i++)
 	{
-		printf("%d ", list[i]);
+    	     printf("%d ", list[i]);
 	}
 
 	printf("\n");
 
-
-	
-
-    pthread_exit(NULL);
+	pthread_exit(NULL);
 	return 0;
 }
-
-void mergeSort(int begin, int end)
-{
-	// calculate middle value
-	int middle = (begin + end) / 2;
-	
-	if(begin < end)
-	{
-		mergeSort(begin, middle);
-
-		mergeSort(middle + 1, end);
-
-		merge(begin, middle, end);
-	}
-}
-
 void *sorter(void *arg)
-{
+{   
+	//To show what thread we are in.
 	int threadNum = thread++;
 	printf("Sorting thread %d\n", threadNum);
 	printf("\n");
-	
-	int begin = thread * (arrSize / 2);
-	int end = (thread + 1) * (arrSize / 2) - 1;
-	int middle = (begin + end) / 2;
-
-	if(begin < end)
+	//Create the variables using struct.
+	struct Params *p = (struct Params *) arg;
+	int begin = p->begin;
+	int end = p->end+1;
+    
+	//Bubble Sort
+	int a,b,temp;
+	for(a=begin; a<end; a++)
 	{
-		printf("sorting left");
-		printf("\n");
-		mergeSort(begin, middle);
-
-		printf("sorting right\n");
-		mergeSort(middle + 1, end);
-
-		printf("merging \n");
-		merge(begin, middle, end);
+    	     for(b=begin; b<end; b++)
+    	     {
+         	 if(list[b]>list[b+1])
+         	 {
+   			temp=list[b];
+   			list[b]=list[b+1];
+   			list[b+1]=temp;
+         	 }
+    	     }
 	}
-	printf("Array in thread %d", threadNum);
-	printf("\n");
-    for(int i = 0; i < arrSize; i++)
-	{
-		printf("%d ", list[i]);
-	}
-	printf("\n");
 }
 
 /**
@@ -134,54 +117,27 @@ void *sorter(void *arg)
 */
 void *merger(void *arg)
 {
-	struct mergerParams *params = (struct mergerParams*) arg;
-	int begin = params->begin,
-    	middle = params-> middle,
-    	end = params-> end;
-
-	merge(begin, middle, end);
-    
+	//Create the merger variables from passed parameters.
+	struct Params *p = (struct Params*) arg;
+	int begin = p->begin;
+	int end = p->end+1;
+   	 
+	//Perform Bubble sort on the merged list.
+	int a,b,temp;
+	for(a=begin; a<end; a++)
+	{
+    	     for(b=begin; b<end; b++)
+    	     {
+         	 if(list[b]>list[b+1])
+         	 {
+   			temp=list[b];
+   			list[b]=list[b+1];
+   			list[b+1]=temp;
+         	 }
+    	     }
+	}
 }
 
-void merge(int begin, int middle, int end)
-{
 
-	int arrsize1 = middle - begin + 1;
-	int arrsize2 = end - middle;
-	int *left = malloc(arrsize1 * sizeof(int));
-	int *right = malloc(arrsize2 * sizeof(int));
-	int i = 0, j = 0;
 
-	printf("Merging left");
-	for(i = 0; i < arrsize1; i++)
-    	left[i] = list[begin + i];
 
-	printf("Merging right");
-	for(i = 0; i < arrsize2; j++)
-    	right[j] = list[middle + 1 + i];
-
-	i = 0;
-	int k = begin;
-
-	while (i < arrsize1 && j < arrsize2)
-	{
-    	if(left[i] <= right[j])
-        	list[begin++] = left[i++];
-    	else
-        	list[k++] = right[j++];
-	}
-
-	while(i < arrsize1)
-	{
-    	list[k++] = left[i++];
-	}
-	while(j < arrsize2)
-	{
-    	list[k++] = right[j++];
-	}
-
-	printf("dealloc\n");
-	// deallocate memory for arrays
-	free(left);
-	free(right);
-}
