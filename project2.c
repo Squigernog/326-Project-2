@@ -65,17 +65,17 @@ int main(int argc, const char* argv[])
 	margs.begin = 0;
 	margs.end = arrSize / 2;
 
-	printf("Merging thread...\n");
+	printf("\nMerging thread...\n");
 	printf("\n");
 	pthread_create(&thread[2], NULL, merger, &margs);
 	//Waits for the merging thread to finish
 	pthread_join(thread[2], NULL);
     
 	//Display the sorted list
-	printf("Sorted List:");
+	printf("Sorted List:\n");
 	for(int i = 0; i < arrSize; i++)
 	{
-    	printf("%d ", list[i]);
+    		printf("%d ", list[i]);
 	}
 
 	printf("\n");
@@ -87,8 +87,7 @@ void *sorter(void *arg)
 {   
 	//To show what thread we are in.
 	int threadNum = thread++;
-	printf("Sorting thread %d\n", threadNum);
-	printf("\n");
+	printf("\nSorting thread %d\n", threadNum);
 	//Create the variables using struct.
 	struct Params *p = (struct Params *) arg;
 	int begin = p->begin;
@@ -97,20 +96,20 @@ void *sorter(void *arg)
 	int a,b,temp;
 	for(a=begin; a<end; a++)
 	{
-    	for(b=begin; b<end; b++)
-    	{
+    	    for(b=begin; b<end; b++)
+    	    {
          	if(list[b]>list[b+1])
          	{
    			temp=list[b];
    			list[b]=list[b+1];
    			list[b+1]=temp;
          	}
-    	}
+    	    }
 	}
-	printf("What the list looks like:");
+	printf("What the list looks like: ");
 	for(int i = 0; i < arrSize; i++)
 	{
-    	printf("%d ", list[i]);
+    		printf("%d ", list[i]);
 	}
 	printf("\n");
 }
@@ -129,15 +128,15 @@ void *merger(void *arg)
 	int a,b,temp;
 	for(a=begin; a<end; a++)
 	{
-    	for(b=begin; b<end; b++)
-    	{
+    	    for(b=begin; b<end; b++)
+    	    {
          	if(list[b]>list[b+1])
          	{
    			temp=list[b];
    			list[b]=list[b+1];
    			list[b+1]=temp;
          	}
-    	}
+    	    }
 	}
 }
 
